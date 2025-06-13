@@ -38,7 +38,9 @@ jobs:
           powershell Expand-Archive -Path love-11.4-win64.zip -DestinationPath .
 
       - name: Build .love file
-        run: powershell Compress-Archive -Path * -DestinationPath game.love
+        run: |
+          powershell Compress-Archive -Path * -DestinationPath game.zip
+          ren game.zip game.love
 
       - name: Create Windows EXE
         run: copy /b love-11.4-win64\love.exe+game.love game.exe
