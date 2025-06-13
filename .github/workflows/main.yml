@@ -38,7 +38,7 @@ jobs:
           copy /b love-11.4-win64\love.exe+game.love game.exe
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: |
