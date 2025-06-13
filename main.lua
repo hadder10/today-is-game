@@ -5,7 +5,6 @@ local scenes = {
 
 local currentScene = "menu"
 
--- Add error handling
 function love.errorhandler(msg)
     print("Error: " .. tostring(msg))
     return false
@@ -27,7 +26,6 @@ function _G.switchScene(sceneName)
 end
 
 function love.load()
-    -- Add error catching
     local success, err = pcall(function()
         if scenes[currentScene].load then
             scenes[currentScene].load()

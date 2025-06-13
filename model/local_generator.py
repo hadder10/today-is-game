@@ -5,7 +5,6 @@ from pathlib import Path
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
-# Setup logging
 logging.basicConfig(
     filename='model_errors.log',
     level=logging.DEBUG,
@@ -13,11 +12,9 @@ logging.basicConfig(
 )
 
 try:
-    # Check if CUDA is available
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logging.info(f"Using device: {device}")
 
-    # Get model path
     model_path = Path(__file__).parent / 'trained_model'
     logging.info(f"Loading model from: {model_path}")
 
