@@ -1,0 +1,46 @@
+name: Build and Deploy Windows Game
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+
+      - name: Install Lua and dependencies
+        run: |
+          choco install lua
+          choco install luarocks
+          luarocks install luacheck
+          luarocks install luasocket
+          luarocks install dkjson
+
+      - name: Lint Lua code
+        run: luacheck .
+
+      - name: Download Love2D for Windows
+        run: |
+          curl -LO https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip
+          tar -xf love-11.4-win64.zip
+
+      - name: Build .love file
+        run: powershell Compress-Archive -Path * -DestinationPath game.love
+
+      - name: Create Windows EXE
+        run: |
+          copy /b love-11.4-win64\love.exe+game.love game.exe
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: |
+            game.exe
+            game.love
