@@ -43,7 +43,7 @@ jobs:
           ren game.zip game.love
 
       - name: Create Windows EXE
-        run: copy /b love-11.4-win64\love.exe+game.love game.exe
+        run: cmd /c "copy /b love-11.4-win64\love.exe+game.love game.exe"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
