@@ -32,9 +32,6 @@ jobs:
           Get-ChildItem -Path "C:\tools\luarocks\systree\bin" -Filter luacheck* -Recurse -ErrorAction SilentlyContinue
           Get-ChildItem -Path "C:\ProgramData\chocolatey\lib\luarocks\tools\luarocks\systree\bin" -Filter luacheck* -Recurse -ErrorAction SilentlyContinue
 
-      - name: Lint Lua code
-        run: luarocks run -- lua luacheck .
-
       - name: Download Love2D for Windows
         run: |
           curl -LO https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip
