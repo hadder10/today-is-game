@@ -23,10 +23,17 @@ jobs:
           luarocks install dkjson
 
       - name: Add LuaRocks to PATH
-        run: echo "C:\Program Files (x86)\LuaRocks\systree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        run: |
+          echo "C:\Program Files (x86)\LuaRocks\systree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\tools\luarocks\systree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\ProgramData\chocolatey\lib\luarocks\tools\luarocks\systree\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "PATH: $env:PATH"
+          Get-ChildItem -Path "C:\Program Files (x86)\LuaRocks\systree\bin" -Filter luacheck* -Recurse -ErrorAction SilentlyContinue
+          Get-ChildItem -Path "C:\tools\luarocks\systree\bin" -Filter luacheck* -Recurse -ErrorAction SilentlyContinue
+          Get-ChildItem -Path "C:\ProgramData\chocolatey\lib\luarocks\tools\luarocks\systree\bin" -Filter luacheck* -Recurse -ErrorAction SilentlyContinue
 
       - name: Lint Lua code
-        run: luacheck .
+        run: luarocks run -- lua luacheck .
 
       - name: Download Love2D for Windows
         run: |
