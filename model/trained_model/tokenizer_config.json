@@ -1,4 +1,5 @@
 {
+  "add_bos_token": false,
   "add_prefix_space": false,
   "added_tokens_decoder": {
     "50256": {
@@ -13,8 +14,9 @@
   "bos_token": "<|endoftext|>",
   "clean_up_tokenization_spaces": false,
   "eos_token": "<|endoftext|>",
+  "errors": "replace",
   "extra_special_tokens": {},
-  "model_max_length": 1024,
+  "model_max_length": 2048,
   "pad_token": "<|endoftext|>",
   "tokenizer_class": "GPT2Tokenizer",
   "unk_token": "<|endoftext|>"

@@ -1,5 +1,6 @@
 local main_game = {}
-local gen = require("client.local_generator")
+-- local gen = require("client.local_generator")
+local gen = require("client.server_gen")
 local json = require("dkjson")
 
 

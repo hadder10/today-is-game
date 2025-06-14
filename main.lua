@@ -25,6 +25,10 @@ function _G.switchScene(sceneName)
     end
 end
 
+local server_process = nil
+
+
+
 function love.load()
     local success, err = pcall(function()
         if scenes[currentScene].load then
