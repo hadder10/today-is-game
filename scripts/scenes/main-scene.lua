@@ -1,19 +1,95 @@
 local main_game = {}
--- local gen = require("client.local_generator")
+local headlines = {}
 local gen = require("client.server_gen")
 local json = require("dkjson")
-local currentNews = require("CurrentNews")
-
-
+local currentNews = require("scripts.CurrentNews")
 local round = 0
-local headlines = {}
-
-local function build_prompt()
-
-end
 
 headline_font = love.graphics.newFont("Chomsky.otf", 20)
 love.graphics.setFont(headline_font)
+
+
+----------------------------------------------------------
+
+function randomizeSigns()
+    for icon in pairs(signs) do
+        signs[icon] = math.random() < 0.5 and "+" or "-"
+    end
+end
+
+function drawSomeTiles(x, y, object_2_draw, icon)
+    if icon.visible then
+        local offsetX = (icon.scale - 1) * 100
+        local offsetY = (icon.scale - 1) * 25
+
+        love.graphics.setColor(love.math.colorFromBytes(208, 208, 193))
+        love.graphics.rectangle("fill",
+            x - offsetX, y - offsetY,
+            200 * icon.scale, 50 * icon.scale)
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.rectangle("line",
+            x - offsetX, y - offsetY,
+            200 * icon.scale, 50 * icon.scale)
+
+        love.graphics.setColor(1, 1, 1)
+        local iconScale = 0.05 * icon.scale
+        local iconWidth = object_2_draw:getWidth() * iconScale
+        local iconHeight = object_2_draw:getHeight() * iconScale
+        local iconX = x + (200 - iconWidth) / 2 - offsetX
+        local iconY = y + (50 - iconHeight) / 2 + 2 - offsetY
+        love.graphics.draw(object_2_draw, iconX, iconY, 0, iconScale, iconScale)
+
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.print(signs[object_2_draw],
+            x + 150 * icon.scale - offsetX,
+            y + 10 * icon.scale - offsetY)
+        love.graphics.setColor(1, 1, 1)
+    end
+end
+
+function checkAllBoxes()
+    return checkbox_1.checked and checkbox_2.checked and
+        checkbox_3.checked and checkbox_4.checked
+end
+
+function getIconCalForIcon(icon)
+    if icon == icon_1 then
+        return icon_cal_1
+    elseif icon == icon_2 then
+        return icon_cal_2
+    elseif icon == icon_3 then
+        return icon_cal_3
+    elseif icon == icon_4 then
+        return icon_cal_4
+    end
+end
+
+function checkGameOver()
+    if labor_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Public Unrest!"
+        game_over_popup.text = "Civil disorder has reached critical levels.\nThe city has fallen into chaos."
+        return true
+    elseif police_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Law Enforcement Collapse!"
+        game_over_popup.text = "Police forces have lost control.\nCrime runs rampant in the streets."
+        return true
+    elseif mafia_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Criminal Uprising!"
+        game_over_popup.text = "The criminal underworld has been destroyed.\nNew, more violent gangs take their place."
+        return true
+    elseif secret_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Intelligence Failure!"
+        game_over_popup.text = "Secret services have been compromised.\nState secrets are leaked to foreign powers."
+        return true
+    end
+    return false
+end
+
+----------------------------------------------------------
 
 function main_game.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -240,42 +316,6 @@ function main_game.load()
     }
 end
 
-function randomizeSigns()
-    for icon in pairs(signs) do
-        signs[icon] = math.random() < 0.5 and "+" or "-"
-    end
-end
-
-function drawSomeTiles(x, y, object_2_draw, icon)
-    if icon.visible then
-        local offsetX = (icon.scale - 1) * 100
-        local offsetY = (icon.scale - 1) * 25
-
-        love.graphics.setColor(love.math.colorFromBytes(208, 208, 193))
-        love.graphics.rectangle("fill",
-            x - offsetX, y - offsetY,
-            200 * icon.scale, 50 * icon.scale)
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.rectangle("line",
-            x - offsetX, y - offsetY,
-            200 * icon.scale, 50 * icon.scale)
-
-        love.graphics.setColor(1, 1, 1)
-        local iconScale = 0.05 * icon.scale
-        local iconWidth = object_2_draw:getWidth() * iconScale
-        local iconHeight = object_2_draw:getHeight() * iconScale
-        local iconX = x + (200 - iconWidth) / 2 - offsetX
-        local iconY = y + (50 - iconHeight) / 2 + 2 - offsetY
-        love.graphics.draw(object_2_draw, iconX, iconY, 0, iconScale, iconScale)
-
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.print(signs[object_2_draw],
-            x + 150 * icon.scale - offsetX,
-            y + 10 * icon.scale - offsetY)
-        love.graphics.setColor(1, 1, 1)
-    end
-end
-
 function main_game.update(dt)
     if is_Dragging == true then
         draggable_now_obj.x = love.mouse.getX() - draggable_now_obj.width / 2
@@ -324,11 +364,6 @@ function main_game.update(dt)
             menu_exit_button.scale = math.max(menu_exit_button.scale - dt * 4, 1.0)
         end
     end
-end
-
-function checkAllBoxes()
-    return checkbox_1.checked and checkbox_2.checked and
-        checkbox_3.checked and checkbox_4.checked
 end
 
 function main_game.draw()
@@ -778,7 +813,6 @@ function main_game.mousepressed(x, y, button, istouch, presses)
     end
 end
 
--- MOUSE RELEASED FUNCTION
 function main_game.mousereleased(x, y, button, istouch, presses)
     if button == 1 and is_Dragging then
         local inside_checkbox = false
@@ -823,41 +857,6 @@ function main_game.mousereleased(x, y, button, istouch, presses)
     end
 end
 
-function getIconCalForIcon(icon)
-    if icon == icon_1 then
-        return icon_cal_1
-    elseif icon == icon_2 then
-        return icon_cal_2
-    elseif icon == icon_3 then
-        return icon_cal_3
-    elseif icon == icon_4 then
-        return icon_cal_4
-    end
-end
-
-function checkGameOver()
-    if labor_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Public Unrest!"
-        game_over_popup.text = "Civil disorder has reached critical levels.\nThe city has fallen into chaos."
-        return true
-    elseif police_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Law Enforcement Collapse!"
-        game_over_popup.text = "Police forces have lost control.\nCrime runs rampant in the streets."
-        return true
-    elseif mafia_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Criminal Uprising!"
-        game_over_popup.text = "The criminal underworld has been destroyed.\nNew, more violent gangs take their place."
-        return true
-    elseif secret_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Intelligence Failure!"
-        game_over_popup.text = "Secret services have been compromised.\nState secrets are leaked to foreign powers."
-        return true
-    end
-    return false
-end
+----------------------------------------------------------
 
 return main_game

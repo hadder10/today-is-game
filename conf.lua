@@ -4,7 +4,6 @@ function love.conf(t)
     t.window.resizable = false
     t.window.title = "Today IS"
 
-    -- Дополнительные настройки
     t.version = "11.4"
     t.console = false
     t.window.vsync = 1
