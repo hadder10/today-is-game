@@ -2,6 +2,7 @@ local main_game = {}
 -- local gen = require("client.local_generator")
 local gen = require("client.server_gen")
 local json = require("dkjson")
+local currentNews = require("CurrentNews")
 
 
 local round = 0
@@ -20,6 +21,7 @@ function main_game.load()
     love.window.setMode(win_width, win_height, { fullscreen = false, vsync = true, resizable = true })
 
     is_Dragging = false
+
     draggable_now_obj = {
         x = 0,
         y = 0,
@@ -61,6 +63,12 @@ function main_game.load()
     checkbox_2 = { x = 0, y = 185, width = 200, height = 235, checked = false, stored_icon = nil }
     checkbox_3 = { x = 0, y = 70, width = 200, height = 195, checked = false, stored_icon = nil }
     checkbox_4 = { x = 212, y = 130, width = 200, height = 135, checked = false, stored_icon = nil }
+
+    labor_stat = { x = 64, y = 30, width = 0.1, height = 0.1, count = 0 }
+    mafia_stat = { x = 183, y = 30, width = 0.1, height = 0.1, count = 0 }
+    police_stat = { x = 302, y = 30, width = 0.1, height = 0.1, count = 0 }
+    secret_stat = { x = 421, y = 30, width = 0.1, height = 0.1, count = 0 }
+
     icon_1 = {
         x = 46,
         y = 750,
@@ -132,12 +140,6 @@ function main_game.load()
     }
 
 
-    labor_stat = { x = 64, y = 30, width = 0.1, height = 0.1, count = 0 }
-    mafia_stat = { x = 183, y = 30, width = 0.1, height = 0.1, count = 0 }
-    police_stat = { x = 302, y = 30, width = 0.1, height = 0.1, count = 0 }
-    secret_stat = { x = 421, y = 30, width = 0.1, height = 0.1, count = 0 }
-
-
     local is_Dragging = false
     local draggable_now_obj
 
@@ -165,9 +167,9 @@ function main_game.load()
     -- FOR SIGNS
     signs = {
         [icon_cal_1] = "+",
-        [icon_cal_2] = "+",
+        [icon_cal_2] = "-",
         [icon_cal_3] = "+",
-        [icon_cal_4] = "+"
+        [icon_cal_4] = "-"
     }
 
     randomizeSigns()
@@ -193,6 +195,7 @@ function main_game.load()
         { icon = icon_3, desc_obj = object_3 },
         { icon = icon_4, desc_obj = object_4 }
     }
+
     local factions = { "public", "police", "mafia", "intelligence" }
     news_texts = {}
 
