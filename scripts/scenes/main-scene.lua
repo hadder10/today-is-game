@@ -1,9 +1,9 @@
 local main_game = {}
 local headlines = {}
 local gen = require("client.server_gen")
-local json = require("dkjson")
 local currentNews = require("scripts.CurrentNews")
 local round = 0
+local min, max = math.min, math.max
 
 headline_font = love.graphics.newFont("Chomsky.otf", 20)
 love.graphics.setFont(headline_font)
@@ -94,7 +94,10 @@ end
 function main_game.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
+
     love.window.setMode(win_width, win_height, { fullscreen = false, vsync = true, resizable = true })
+    love.window.setTitle("Today is")
+
 
     is_Dragging = false
 
@@ -104,8 +107,6 @@ function main_game.load()
         width = 0,
         height = 0
     }
-
-    love.window.setTitle("Today is")
 
     main_news = love.graphics.newImage("sprites/paper.png")
     main_new = { x = 40, y = 120, width = main_news:getWidth() * 0.5, height = main_news:getHeight() * 0.5 }
@@ -327,41 +328,41 @@ function main_game.update(dt)
     for _, icon in ipairs({ icon_1, icon_2, icon_3, icon_4 }) do
         if icon.visible and mx > icon.x and mx < icon.x + icon.width and
             my > icon.y and my < icon.y + icon.height then
-            icon.scale = math.min(icon.scale + dt * 4, 1.1)
+            icon.scale = min(icon.scale + dt * 4, 1.1)
         else
-            icon.scale = math.max(icon.scale - dt * 4, 1.0)
+            icon.scale = max(icon.scale - dt * 4, 1.0)
         end
     end
 
     if checkAllBoxes() then
         if mx > button_1.x and mx < button_1.x + button_1.width and
             my > button_1.y and my < button_1.y + button_1.height then
-            button_1.scale = math.min(button_1.scale + dt * 4, 1.1)
+            button_1.scale = min(button_1.scale + dt * 4, 1.1)
         else
-            button_1.scale = math.max(button_1.scale - dt * 4, 1.0)
+            button_1.scale = max(button_1.scale - dt * 4, 1.0)
         end
 
         if mx > button_2.x and mx < button_2.x + button_2.width and
             my > button_2.y and my < button_2.y + button_2.height then
-            button_2.scale = math.min(button_2.scale + dt * 4, 1.1)
+            button_2.scale = min(button_2.scale + dt * 4, 1.1)
         else
-            button_2.scale = math.max(button_2.scale - dt * 4, 1.0)
+            button_2.scale = max(button_2.scale - dt * 4, 1.0)
         end
     end
 
     if mx > menu_button.x and mx < menu_button.x + menu_button.width and
         my > menu_button.y and my < menu_button.y + menu_button.height then
-        menu_button.scale = math.min(menu_button.scale + dt * 4, 1.1)
+        menu_button.scale = min(menu_button.scale + dt * 4, 1.1)
     else
-        menu_button.scale = math.max(menu_button.scale - dt * 4, 1.0)
+        menu_button.scale = max(menu_button.scale - dt * 4, 1.0)
     end
 
     if menu_overlay.visible then
         if mx > menu_exit_button.x and mx < menu_exit_button.x + menu_exit_button.width and
             my > menu_exit_button.y and my < menu_exit_button.y + menu_exit_button.height then
-            menu_exit_button.scale = math.min(menu_exit_button.scale + dt * 4, 1.1)
+            menu_exit_button.scale = min(menu_exit_button.scale + dt * 4, 1.1)
         else
-            menu_exit_button.scale = math.max(menu_exit_button.scale - dt * 4, 1.0)
+            menu_exit_button.scale = max(menu_exit_button.scale - dt * 4, 1.0)
         end
     end
 end
