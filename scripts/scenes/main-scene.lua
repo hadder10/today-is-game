@@ -1,11 +1,12 @@
 local main_game = {}
 local headlines = {}
 local gen = require("client.server_gen")
-local currentNews = require("scripts.CurrentNews")
+local love = require("love")
+-- local currentNews = require("scripts.CurrentNews")
 local round = 0
 local min, max = math.min, math.max
 
-headline_font = love.graphics.newFont("Chomsky.otf", 20)
+local headline_font = love.graphics.newFont("Chomsky.otf", 20)
 love.graphics.setFont(headline_font)
 
 
