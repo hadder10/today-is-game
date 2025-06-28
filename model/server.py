@@ -6,7 +6,6 @@ from pathlib import Path
 app = Flask(__name__)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-# Получаем абсолютный путь к директории с моделью
 model_dir = Path(__file__).parent / "trained_model"
 
 tokenizer = AutoTokenizer.from_pretrained(str(model_dir))

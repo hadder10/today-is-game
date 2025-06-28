@@ -2,9 +2,9 @@ name: Build and Deploy Windows Game
 
 on:
   push:
-    branches: [main]
+    branches: [main, android-main]
   pull_request:
-    branches: [main]
+    branches: [main, android-main]
 
 jobs:
   build-windows:
