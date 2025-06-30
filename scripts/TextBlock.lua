@@ -7,7 +7,7 @@ function TextBlock:new(x, y, width, text, align, color)
         y = y,
         width = width,
         text = text,
-        align = align or "left",
+        align = align or "center",
         color = color or { 0, 0, 0 }
     }
     setmetatable(block, TextBlock)

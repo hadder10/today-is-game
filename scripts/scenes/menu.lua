@@ -1,12 +1,7 @@
 local menu = {}
+local love = require("love")
 
-win_width, win_height = 540, 960
-
-function love.conf(t)
-    t.window.width = win_width
-    t.window.height = win_height
-    t.window.resizable = false
-end
+win_width, win_height = love.graphics.getWidth(), love.graphics.getHeight()
 
 function menu.load()
     chomstick = love.graphics.newFont("Chomsky.otf", 30)

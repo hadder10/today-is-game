@@ -1,11 +1,14 @@
-function love.conf(t)
-    t.window.width = 540
-    t.window.height = 960
-    t.window.resizable = false
-    t.window.title = "Today IS"
+local love = require("love")
 
-    -- Дополнительные настройки
-    t.version = "11.4"
-    t.console = false
-    t.window.vsync = 1
+
+function love.conf(game)
+    game.window.width = 1920
+    game.window.height = 1080
+    game.window.resizable = false
+    game.window.title = "Today Is"
+    game.window.display = 2
+
+    game.version = "11.5"
+    game.console = false
+    game.window.vsync = 1
 end

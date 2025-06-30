@@ -1,3 +1,5 @@
+local love = require("love")
+
 local scenes = {
     menu = require "scripts.scenes.menu",
     game = require "scripts.scenes.main-scene"
@@ -24,10 +26,6 @@ function _G.switchScene(sceneName)
         end
     end
 end
-
-local server_process = nil
-
-
 
 function love.load()
     local success, err = pcall(function()

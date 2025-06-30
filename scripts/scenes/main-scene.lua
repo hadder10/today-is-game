@@ -1,33 +1,114 @@
 local main_game = {}
--- local gen = require("client.local_generator")
-local gen = require("client.server_gen")
-local json = require("dkjson")
-
-
-local round = 0
 local headlines = {}
+-- local gen = require("client.server_gen")
+local love = require("love")
+-- local currentNews = require("scripts.CurrentNews")
+local round = 0
+local min, max = math.min, math.max
 
-local function build_prompt()
+local headline_font = love.graphics.newFont("Chomsky.otf", 20)
+love.graphics.setFont(headline_font)
 
+
+
+----------------------------------------------------------
+
+function randomizeSigns()
+    for icon in pairs(signs) do
+        signs[icon] = math.random() < 0.5 and "+" or "-"
+    end
 end
 
-headline_font = love.graphics.newFont("Chomsky.otf", 20)
-love.graphics.setFont(headline_font)
+function drawSomeTiles(x, y, object_2_draw, icon)
+    if icon.visible then
+        local offsetX = (icon.scale - 1) * 100
+        local offsetY = (icon.scale - 1) * 25
+
+        love.graphics.setColor(love.math.colorFromBytes(208, 208, 193))
+        love.graphics.rectangle("fill",
+            x - offsetX, y - offsetY,
+            200 * icon.scale, 50 * icon.scale)
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.rectangle("line",
+            x - offsetX, y - offsetY,
+            200 * icon.scale, 50 * icon.scale)
+
+        love.graphics.setColor(1, 1, 1)
+        local iconScale = 0.05 * icon.scale
+        local iconWidth = object_2_draw:getWidth() * iconScale
+        local iconHeight = object_2_draw:getHeight() * iconScale
+        local iconX = x + (200 - iconWidth) / 2 - offsetX
+        local iconY = y + (50 - iconHeight) / 2 + 2 - offsetY
+        love.graphics.draw(object_2_draw, iconX, iconY, 0, iconScale, iconScale)
+
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.print(signs[object_2_draw],
+            x + 150 * icon.scale - offsetX,
+            y + 10 * icon.scale - offsetY)
+        love.graphics.setColor(1, 1, 1)
+    end
+end
+
+function checkAllBoxes()
+    return checkbox_1.checked and checkbox_2.checked and
+        checkbox_3.checked and checkbox_4.checked
+end
+
+function getIconCalForIcon(icon)
+    if icon == icon_1 then
+        return icon_cal_1
+    elseif icon == icon_2 then
+        return icon_cal_2
+    elseif icon == icon_3 then
+        return icon_cal_3
+    elseif icon == icon_4 then
+        return icon_cal_4
+    end
+end
+
+function checkGameOver()
+    if labor_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Public Unrest!"
+        game_over_popup.text = "Civil disorder has reached critical levels.\nThe city has fallen into chaos."
+        return true
+    elseif police_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Law Enforcement Collapse!"
+        game_over_popup.text = "Police forces have lost control.\nCrime runs rampant in the streets."
+        return true
+    elseif mafia_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Criminal Uprising!"
+        game_over_popup.text = "The criminal underworld has been destroyed.\nNew, more violent gangs take their place."
+        return true
+    elseif secret_stat.count <= -20 then
+        game_over_popup.visible = true
+        game_over_popup.title = "Intelligence Failure!"
+        game_over_popup.text = "Secret services have been compromised.\nState secrets are leaked to foreign powers."
+        return true
+    end
+    return false
+end
+
+----------------------------------------------------------
 
 function main_game.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
 
+
     love.window.setMode(win_width, win_height, { fullscreen = false, vsync = true, resizable = true })
+    love.window.setTitle("Today is")
+
 
     is_Dragging = false
+
     draggable_now_obj = {
         x = 0,
         y = 0,
         width = 0,
         height = 0
     }
-
-    love.window.setTitle("Today is")
 
     main_news = love.graphics.newImage("sprites/paper.png")
     main_new = { x = 40, y = 120, width = main_news:getWidth() * 0.5, height = main_news:getHeight() * 0.5 }
@@ -61,6 +142,12 @@ function main_game.load()
     checkbox_2 = { x = 0, y = 185, width = 200, height = 235, checked = false, stored_icon = nil }
     checkbox_3 = { x = 0, y = 70, width = 200, height = 195, checked = false, stored_icon = nil }
     checkbox_4 = { x = 212, y = 130, width = 200, height = 135, checked = false, stored_icon = nil }
+
+    labor_stat = { x = 64, y = 30, width = 0.1, height = 0.1, count = 0 }
+    mafia_stat = { x = 183, y = 30, width = 0.1, height = 0.1, count = 0 }
+    police_stat = { x = 302, y = 30, width = 0.1, height = 0.1, count = 0 }
+    secret_stat = { x = 421, y = 30, width = 0.1, height = 0.1, count = 0 }
+
     icon_1 = {
         x = 46,
         y = 750,
@@ -132,12 +219,6 @@ function main_game.load()
     }
 
 
-    labor_stat = { x = 64, y = 30, width = 0.1, height = 0.1, count = 0 }
-    mafia_stat = { x = 183, y = 30, width = 0.1, height = 0.1, count = 0 }
-    police_stat = { x = 302, y = 30, width = 0.1, height = 0.1, count = 0 }
-    secret_stat = { x = 421, y = 30, width = 0.1, height = 0.1, count = 0 }
-
-
     local is_Dragging = false
     local draggable_now_obj
 
@@ -165,9 +246,9 @@ function main_game.load()
     -- FOR SIGNS
     signs = {
         [icon_cal_1] = "+",
-        [icon_cal_2] = "+",
+        [icon_cal_2] = "-",
         [icon_cal_3] = "+",
-        [icon_cal_4] = "+"
+        [icon_cal_4] = "-"
     }
 
     randomizeSigns()
@@ -193,28 +274,29 @@ function main_game.load()
         { icon = icon_3, desc_obj = object_3 },
         { icon = icon_4, desc_obj = object_4 }
     }
+
     local factions = { "public", "police", "mafia", "intelligence" }
     news_texts = {}
 
     for i, data in ipairs(initial_headlines) do
         local prompt = { faction = factions[i] }
-        local headline, description = gen.generate(prompt)
+        -- local headline, description = gen.generate(prompt)
 
-        if headline and description then
-            headline = headline:gsub("Generate news headline about this faction:", "")
-            headline = headline:gsub("Current situation:", "")
-            headline = headline:gsub("Faction: ", "")
-            headline = headline:gsub("State: ", "")
+        -- if headline and description then
+        --     headline = headline:gsub("Generate news headline about this faction:", "")
+        --     headline = headline:gsub("Current situation:", "")
+        --     headline = headline:gsub("Faction: ", "")
+        --     headline = headline:gsub("State: ", "")
 
-            headline = headline:gsub("^%s*(.-)%s*$", "%1")
-            description = description:gsub("^%s*(.-)%s*$", "%1")
+        --     headline = headline:gsub("^%s*(.-)%s*$", "%1")
+        --     description = description:gsub("^%s*(.-)%s*$", "%1")
 
-            news_texts[data.icon] = headline
-            data.desc_obj.current_text = description
-        else
-            news_texts[data.icon] = "Breaking News"
-            data.desc_obj.current_text = "Situation continues to develop."
-        end
+        --     news_texts[data.icon] = headline
+        --     data.desc_obj.current_text = description
+        -- else
+        news_texts[data.icon] = "Breaking News"
+        data.desc_obj.current_text = "Situation continues to develop."
+        -- end
     end
 
     info_window = {
@@ -237,42 +319,6 @@ function main_game.load()
     }
 end
 
-function randomizeSigns()
-    for icon in pairs(signs) do
-        signs[icon] = math.random() < 0.5 and "+" or "-"
-    end
-end
-
-function drawSomeTiles(x, y, object_2_draw, icon)
-    if icon.visible then
-        local offsetX = (icon.scale - 1) * 100
-        local offsetY = (icon.scale - 1) * 25
-
-        love.graphics.setColor(love.math.colorFromBytes(208, 208, 193))
-        love.graphics.rectangle("fill",
-            x - offsetX, y - offsetY,
-            200 * icon.scale, 50 * icon.scale)
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.rectangle("line",
-            x - offsetX, y - offsetY,
-            200 * icon.scale, 50 * icon.scale)
-
-        love.graphics.setColor(1, 1, 1)
-        local iconScale = 0.05 * icon.scale
-        local iconWidth = object_2_draw:getWidth() * iconScale
-        local iconHeight = object_2_draw:getHeight() * iconScale
-        local iconX = x + (200 - iconWidth) / 2 - offsetX
-        local iconY = y + (50 - iconHeight) / 2 + 2 - offsetY
-        love.graphics.draw(object_2_draw, iconX, iconY, 0, iconScale, iconScale)
-
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.print(signs[object_2_draw],
-            x + 150 * icon.scale - offsetX,
-            y + 10 * icon.scale - offsetY)
-        love.graphics.setColor(1, 1, 1)
-    end
-end
-
 function main_game.update(dt)
     if is_Dragging == true then
         draggable_now_obj.x = love.mouse.getX() - draggable_now_obj.width / 2
@@ -284,48 +330,43 @@ function main_game.update(dt)
     for _, icon in ipairs({ icon_1, icon_2, icon_3, icon_4 }) do
         if icon.visible and mx > icon.x and mx < icon.x + icon.width and
             my > icon.y and my < icon.y + icon.height then
-            icon.scale = math.min(icon.scale + dt * 4, 1.1)
+            icon.scale = min(icon.scale + dt * 4, 1.1)
         else
-            icon.scale = math.max(icon.scale - dt * 4, 1.0)
+            icon.scale = max(icon.scale - dt * 4, 1.0)
         end
     end
 
     if checkAllBoxes() then
         if mx > button_1.x and mx < button_1.x + button_1.width and
             my > button_1.y and my < button_1.y + button_1.height then
-            button_1.scale = math.min(button_1.scale + dt * 4, 1.1)
+            button_1.scale = min(button_1.scale + dt * 4, 1.1)
         else
-            button_1.scale = math.max(button_1.scale - dt * 4, 1.0)
+            button_1.scale = max(button_1.scale - dt * 4, 1.0)
         end
 
         if mx > button_2.x and mx < button_2.x + button_2.width and
             my > button_2.y and my < button_2.y + button_2.height then
-            button_2.scale = math.min(button_2.scale + dt * 4, 1.1)
+            button_2.scale = min(button_2.scale + dt * 4, 1.1)
         else
-            button_2.scale = math.max(button_2.scale - dt * 4, 1.0)
+            button_2.scale = max(button_2.scale - dt * 4, 1.0)
         end
     end
 
     if mx > menu_button.x and mx < menu_button.x + menu_button.width and
         my > menu_button.y and my < menu_button.y + menu_button.height then
-        menu_button.scale = math.min(menu_button.scale + dt * 4, 1.1)
+        menu_button.scale = min(menu_button.scale + dt * 4, 1.1)
     else
-        menu_button.scale = math.max(menu_button.scale - dt * 4, 1.0)
+        menu_button.scale = max(menu_button.scale - dt * 4, 1.0)
     end
 
     if menu_overlay.visible then
         if mx > menu_exit_button.x and mx < menu_exit_button.x + menu_exit_button.width and
             my > menu_exit_button.y and my < menu_exit_button.y + menu_exit_button.height then
-            menu_exit_button.scale = math.min(menu_exit_button.scale + dt * 4, 1.1)
+            menu_exit_button.scale = min(menu_exit_button.scale + dt * 4, 1.1)
         else
-            menu_exit_button.scale = math.max(menu_exit_button.scale - dt * 4, 1.0)
+            menu_exit_button.scale = max(menu_exit_button.scale - dt * 4, 1.0)
         end
     end
-end
-
-function checkAllBoxes()
-    return checkbox_1.checked and checkbox_2.checked and
-        checkbox_3.checked and checkbox_4.checked
 end
 
 function main_game.draw()
@@ -674,27 +715,27 @@ function main_game.mousepressed(x, y, button, istouch, presses)
                         { faction = "intelligence", icon = icon_4, obj = object_4 }
                     }
 
-                    for _, data in ipairs(factions_data) do
-                        local prompt = {
-                            faction = data.faction
-                        }
+                    -- for _, data in ipairs(factions_data) do
+                    --     local prompt = {
+                    --         faction = data.faction
+                    --     }
 
-                        local headline, description = gen.generate(prompt)
+                    --     local headline, description = gen.generate(prompt)
 
-                        if headline and description then
-                            headline = headline:gsub("Generate news headline about this faction:", "")
-                            headline = headline:gsub("Current situation:", "")
-                            headline = headline:gsub("Faction: ", "")
+                    --     if headline and description then
+                    --         headline = headline:gsub("Generate news headline about this faction:", "")
+                    --         headline = headline:gsub("Current situation:", "")
+                    --         headline = headline:gsub("Faction: ", "")
 
-                            headline = headline:gsub("^%s*(.-)%s*$", "%1")
-                            description = description:gsub("^%s*(.-)%s*$", "%1")
+                    --         headline = headline:gsub("^%s*(.-)%s*$", "%1")
+                    --         description = description:gsub("^%s*(.-)%s*$", "%1")
 
-                            if headline ~= "" then
-                                news_texts[data.icon] = headline
-                                data.obj.current_text = description
-                            end
-                        end
-                    end
+                    --         if headline ~= "" then
+                    --             news_texts[data.icon] = headline
+                    --             data.obj.current_text = description
+                    --         end
+                    --     end
+                    -- end
                 end
 
                 randomizeSigns()
@@ -775,7 +816,6 @@ function main_game.mousepressed(x, y, button, istouch, presses)
     end
 end
 
--- MOUSE RELEASED FUNCTION
 function main_game.mousereleased(x, y, button, istouch, presses)
     if button == 1 and is_Dragging then
         local inside_checkbox = false
@@ -820,41 +860,6 @@ function main_game.mousereleased(x, y, button, istouch, presses)
     end
 end
 
-function getIconCalForIcon(icon)
-    if icon == icon_1 then
-        return icon_cal_1
-    elseif icon == icon_2 then
-        return icon_cal_2
-    elseif icon == icon_3 then
-        return icon_cal_3
-    elseif icon == icon_4 then
-        return icon_cal_4
-    end
-end
-
-function checkGameOver()
-    if labor_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Public Unrest!"
-        game_over_popup.text = "Civil disorder has reached critical levels.\nThe city has fallen into chaos."
-        return true
-    elseif police_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Law Enforcement Collapse!"
-        game_over_popup.text = "Police forces have lost control.\nCrime runs rampant in the streets."
-        return true
-    elseif mafia_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Criminal Uprising!"
-        game_over_popup.text = "The criminal underworld has been destroyed.\nNew, more violent gangs take their place."
-        return true
-    elseif secret_stat.count <= -20 then
-        game_over_popup.visible = true
-        game_over_popup.title = "Intelligence Failure!"
-        game_over_popup.text = "Secret services have been compromised.\nState secrets are leaked to foreign powers."
-        return true
-    end
-    return false
-end
+----------------------------------------------------------
 
 return main_game
