@@ -1,3 +1,5 @@
+local love = require("love")
+
 local scenes = {
     menu = require "scripts.scenes.menu",
     game = require "scripts.scenes.main-scene"

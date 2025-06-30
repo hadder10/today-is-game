@@ -1,6 +1,6 @@
 local main_game = {}
 local headlines = {}
-local gen = require("client.server_gen")
+-- local gen = require("client.server_gen")
 local love = require("love")
 -- local currentNews = require("scripts.CurrentNews")
 local round = 0
@@ -8,6 +8,7 @@ local min, max = math.min, math.max
 
 local headline_font = love.graphics.newFont("Chomsky.otf", 20)
 love.graphics.setFont(headline_font)
+
 
 
 ----------------------------------------------------------
@@ -279,23 +280,23 @@ function main_game.load()
 
     for i, data in ipairs(initial_headlines) do
         local prompt = { faction = factions[i] }
-        local headline, description = gen.generate(prompt)
+        -- local headline, description = gen.generate(prompt)
 
-        if headline and description then
-            headline = headline:gsub("Generate news headline about this faction:", "")
-            headline = headline:gsub("Current situation:", "")
-            headline = headline:gsub("Faction: ", "")
-            headline = headline:gsub("State: ", "")
+        -- if headline and description then
+        --     headline = headline:gsub("Generate news headline about this faction:", "")
+        --     headline = headline:gsub("Current situation:", "")
+        --     headline = headline:gsub("Faction: ", "")
+        --     headline = headline:gsub("State: ", "")
 
-            headline = headline:gsub("^%s*(.-)%s*$", "%1")
-            description = description:gsub("^%s*(.-)%s*$", "%1")
+        --     headline = headline:gsub("^%s*(.-)%s*$", "%1")
+        --     description = description:gsub("^%s*(.-)%s*$", "%1")
 
-            news_texts[data.icon] = headline
-            data.desc_obj.current_text = description
-        else
-            news_texts[data.icon] = "Breaking News"
-            data.desc_obj.current_text = "Situation continues to develop."
-        end
+        --     news_texts[data.icon] = headline
+        --     data.desc_obj.current_text = description
+        -- else
+        news_texts[data.icon] = "Breaking News"
+        data.desc_obj.current_text = "Situation continues to develop."
+        -- end
     end
 
     info_window = {
@@ -714,27 +715,27 @@ function main_game.mousepressed(x, y, button, istouch, presses)
                         { faction = "intelligence", icon = icon_4, obj = object_4 }
                     }
 
-                    for _, data in ipairs(factions_data) do
-                        local prompt = {
-                            faction = data.faction
-                        }
+                    -- for _, data in ipairs(factions_data) do
+                    --     local prompt = {
+                    --         faction = data.faction
+                    --     }
 
-                        local headline, description = gen.generate(prompt)
+                    --     local headline, description = gen.generate(prompt)
 
-                        if headline and description then
-                            headline = headline:gsub("Generate news headline about this faction:", "")
-                            headline = headline:gsub("Current situation:", "")
-                            headline = headline:gsub("Faction: ", "")
+                    --     if headline and description then
+                    --         headline = headline:gsub("Generate news headline about this faction:", "")
+                    --         headline = headline:gsub("Current situation:", "")
+                    --         headline = headline:gsub("Faction: ", "")
 
-                            headline = headline:gsub("^%s*(.-)%s*$", "%1")
-                            description = description:gsub("^%s*(.-)%s*$", "%1")
+                    --         headline = headline:gsub("^%s*(.-)%s*$", "%1")
+                    --         description = description:gsub("^%s*(.-)%s*$", "%1")
 
-                            if headline ~= "" then
-                                news_texts[data.icon] = headline
-                                data.obj.current_text = description
-                            end
-                        end
-                    end
+                    --         if headline ~= "" then
+                    --             news_texts[data.icon] = headline
+                    --             data.obj.current_text = description
+                    --         end
+                    --     end
+                    -- end
                 end
 
                 randomizeSigns()
